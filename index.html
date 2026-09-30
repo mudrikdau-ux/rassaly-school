@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Rasally School | Staff Management System</title>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/index.css">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="login-container">
+    <!-- Professional Login Card -->
+    <div class="login-card" role="main" aria-labelledby="system-heading">
+      
+      <!-- Logo & Branding Section -->
+      <div class="brand-section">
+        <div class="logo-wrapper">
+          <img 
+            src="images/rasally.jpg" 
+            alt="Rasally School Official Logo" 
+            class="school-logo"
+            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22 viewBox=%220 0 120 120%22%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%2258%22 fill=%22%231e3a5f%22 stroke=%22%23f0b84d%22 stroke-width=%224%22/%3E%3Ctext x=%2260%22 y=%2270%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22%3ERS%3C/text%3E%3C/svg%3E';"
+          >
+        </div>
+        <h1 class="system-heading" id="system-heading">
+          RASALLY SCHOOL
+        </h1>
+        <p class="system-subtitle">STAFF MANAGEMENT SYSTEM</p>
+        <p class="portal-description">Secure Staff Portal Access</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="staffLoginForm" class="login-form" novalidate>
+        
+        <!-- Full Name Field -->
+        <div class="input-group">
+          <label for="fullName" class="input-label">Full Name</label>
+          <input 
+            type="text" 
+            id="fullName" 
+            name="fullName" 
+            placeholder="Enter your full name" 
+            class="input-field"
+            autocomplete="name"
+            aria-required="true"
+            minlength="3"
+          >
+          <span class="error-message" id="nameError" role="alert"></span>
+        </div>
+
+        <!-- Email Address Field -->
+        <div class="input-group">
+          <label for="email" class="input-label">Institutional Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="Enter your institutional email" 
+            class="input-field"
+            autocomplete="email"
+            aria-required="true"
+          >
+          <span class="error-message" id="emailError" role="alert"></span>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="input-group">
+          <label for="userRole" class="input-label">User Role</label>
+          <div class="select-wrapper">
+            <select id="userRole" name="userRole" class="input-field select-field" aria-required="true">
+              <option value="" disabled selected>Select your role</option>
+              <option value="Admin">Admin</option>
+              <option value="HR Officer">HR Officer</option>
+              <option value="Employee">Employee</option>
+            </select>
+          </div>
+          <span class="error-message" id="roleError" role="alert"></span>
+        </div>
+
+        <!-- Password Field -->
+        <div class="input-group">
+          <label for="password" class="input-label">Password</label>
+          <div class="password-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Enter your password" 
+              class="input-field password-field"
+              autocomplete="current-password"
+              aria-required="true"
+              minlength="6"
+            >
+            <button 
+              type="button" 
+              id="togglePasswordBtn" 
+              class="toggle-password-btn" 
+              aria-label="Show password"
+              title="Show password"
+            >
+              <span class="eye-icon" id="eyeIcon">👁️</span>
+            </button>
+          </div>
+          <span class="error-message" id="passwordError" role="alert"></span>
+        </div>
+
+        <!-- OTP Section -->
+        <div class="otp-section" id="otpSection">
+          <div class="otp-header">
+            <button type="button" id="sendOtpBtn" class="btn btn-outline">
+              <span class="btn-text">Send Verification Code</span>
+              <span class="loading-spinner hidden" id="otpSpinner"></span>
+            </button>
+            <button type="button" id="resendOtpBtn" class="btn btn-link hidden" disabled>
+              Resend OTP <span id="countdownTimer"></span>
+            </button>
+          </div>
+          
+          <p class="otp-notification" id="otpNotification" role="status"></p>
+          
+          <!-- OTP Input Group (hidden initially) -->
+          <div class="otp-input-group hidden" id="otpInputContainer">
+            <label for="otpField" class="input-label">Enter 6-Digit Code</label>
+            <input 
+              type="text" 
+              id="otpField" 
+              name="otpField" 
+              class="input-field otp-field" 
+              placeholder="000000" 
+              maxlength="6" 
+              inputmode="numeric" 
+              autocomplete="one-time-code"
+              aria-required="true"
+            >
+            <button type="button" id="verifyOtpBtn" class="btn btn-accent">
+              Verify OTP
+            </button>
+            <span class="error-message" id="otpError" role="alert"></span>
+            <p class="success-message hidden" id="otpSuccess" role="status">
+              ✅ Email verified successfully.
+            </p>
+          </div>
+        </div>
+
+        <!-- Final Login Button -->
+        <button 
+          type="submit" 
+          id="loginBtn" 
+          class="btn btn-primary login-submit" 
+          disabled
+        >
+          <span class="btn-text">Login to System</span>
+          <span class="loading-spinner hidden" id="loginSpinner"></span>
+        </button>
+
+        <!-- General Form Message -->
+        <div id="formGeneralMessage" class="general-message" role="alert"></div>
+      </form>
+      
+      <!-- Forgot Password Link -->
+      <div class="forgot-password-section">
+        <button type="button" id="forgotPasswordBtn" class="btn btn-link forgot-password-link">
+          Forgot Password?
+        </button>
+      </div>
+      
+      <footer class="portal-footer">
+        <p>© 2026 Rasally School · Secure Staff Portal</p>
+        <p class="footer-support">Need help? Contact IT Support</p>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal-overlay hidden" id="forgotPasswordModal" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 id="forgotPasswordTitle" class="modal-title">Password Recovery</h2>
+        <button type="button" class="modal-close-btn" id="closeForgotPasswordModal" aria-label="Close password recovery">
+          &times;
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Step 1: Enter Details for Recovery -->
+        <div class="recovery-step" id="recoveryStep1">
+          <h3 class="step-title">Reset Your Password</h3>
+          <p class="step-description">Enter your details to receive a password reset code.</p>
+          
+          <form id="recoveryIdentityForm" class="recovery-form" novalidate>
+            <div class="input-group">
+              <label for="recoveryFullName" class="input-label">Full Name</label>
+              <input 
+                type="text" 
+                id="recoveryFullName" 
+                name="recoveryFullName" 
+                placeholder="Enter your full name" 
+                class="input-field"
+                autocomplete="name"
+                required
+              >
+              <span class="error-message" id="recoveryNameError" role="alert"></span>
+            </div>
+            
+            <div class="input-group">
+              <label for="recoveryEmail" class="input-label">Email Address</label>
+              <input 
+                type="email" 
+                id="recoveryEmail" 
+                name="recoveryEmail" 
+                placeholder="Enter your institutional email" 
+                class="input-field"
+                autocomplete="email"
+                required
+              >
+              <span class="error-message" id="recoveryEmailError" role="alert"></span>
+            </div>
+
+            <div class="input-group">
+              <label for="recoveryRole" class="input-label">User Role</label>
+              <div class="select-wrapper">
+                <select id="recoveryRole" name="recoveryRole" class="input-field select-field" required>
+                  <option value="" disabled selected>Select your role</option>
+                  <option value="Employee">Employee</option>
+                  <option value="HR Officer">HR Officer</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+              <span class="error-message" id="recoveryRoleError" role="alert"></span>
+            </div>
+            
+            <div class="recovery-message" id="recoveryIdentityMessage"></div>
+            
+            <button type="submit" class="btn btn-primary" id="verifyIdentityBtn">
+              <span class="btn-text">Send Reset Code</span>
+              <span class="loading-spinner hidden" id="identitySpinner"></span>
+            </button>
+          </form>
+        </div>
+        
+        <!-- Step 2: Admin Security Message -->
+        <div class="recovery-step hidden" id="recoveryAdminStep">
+          <div class="admin-security-message">
+            <div class="security-icon">🔒</div>
+            <h3>Admin Password Recovery</h3>
+            <p>For security reasons, Admin password recovery is not available through this option.</p>
+            <p>Please contact the <strong>Database Expert</strong> or authorized <strong>System Administrator</strong> to reset your password directly from the database.</p>
+            <button type="button" class="btn btn-primary back-to-login-btn" id="backToLoginFromAdmin">
+              Back to Login
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 3: OTP Verification -->
+        <div class="recovery-step hidden" id="recoveryStep3">
+          <h3 class="step-title">Enter Verification Code</h3>
+          <p class="step-description">
+            A 6-digit code has been sent to <strong id="recoveryOtpEmail"></strong>
+          </p>
+          
+          <div class="input-group">
+            <label for="recoveryOtpField" class="input-label">6-Digit Code</label>
+            <input 
+              type="text" 
+              id="recoveryOtpField" 
+              name="recoveryOtpField" 
+              class="input-field otp-field" 
+              placeholder="000000" 
+              maxlength="6" 
+              inputmode="numeric"
+              required
+            >
+            <span class="error-message" id="recoveryOtpError" role="alert"></span>
+          </div>
+          
+          <div class="otp-actions">
+            <button type="button" class="btn btn-accent" id="verifyRecoveryOtpBtn">
+              Verify Code
+            </button>
+            <button type="button" class="btn btn-link" id="resendRecoveryOtpBtn">
+              Resend Code <span id="recoveryCountdownTimer"></span>
+            </button>
+          </div>
+          
+          <div class="recovery-message" id="recoveryOtpMessage"></div>
+        </div>
+        
+        <!-- Step 4: Reset Password -->
+        <div class="recovery-step hidden" id="recoveryStep4">
+          <h3 class="step-title">Create New Password</h3>
+          <p class="step-description">Enter your new password below.</p>
+          
+          <form id="resetPasswordForm" class="recovery-form" novalidate>
+            <div class="input-group">
+              <label for="recoveryNewPassword" class="input-label">New Password</label>
+              <div class="password-wrapper">
+                <input 
+                  type="password" 
+                  id="recoveryNewPassword" 
+                  name="recoveryNewPassword" 
+                  placeholder="Enter new password" 
+                  class="input-field password-field"
+                  autocomplete="new-password"
+                  required
+                  minlength="6"
+                >
+                <button 
+                  type="button" 
+                  id="toggleRecoveryPasswordBtn" 
+                  class="toggle-password-btn" 
+                  aria-label="Show password"
+                  title="Show password"
+                >
+                  <span class="eye-icon">👁️</span>
+                </button>
+              </div>
+              <span class="error-message" id="newPasswordError" role="alert"></span>
+            </div>
+            
+            <div class="input-group">
+              <label for="recoveryConfirmPassword" class="input-label">Confirm New Password</label>
+              <div class="password-wrapper">
+                <input 
+                  type="password" 
+                  id="recoveryConfirmPassword" 
+                  name="recoveryConfirmPassword" 
+                  placeholder="Confirm new password" 
+                  class="input-field password-field"
+                  autocomplete="new-password"
+                  required
+                  minlength="6"
+                >
+                <button 
+                  type="button" 
+                  id="toggleRecoveryConfirmPasswordBtn" 
+                  class="toggle-password-btn" 
+                  aria-label="Show password"
+                  title="Show password"
+                >
+                  <span class="eye-icon">👁️</span>
+                </button>
+              </div>
+              <span class="error-message" id="confirmPasswordError" role="alert"></span>
+            </div>
+            
+            <div class="recovery-message" id="resetPasswordMessage"></div>
+            
+            <button type="submit" class="btn btn-primary" id="resetPasswordBtn">
+              <span class="btn-text">Save New Password</span>
+              <span class="loading-spinner hidden" id="resetSpinner"></span>
+            </button>
+          </form>
+        </div>
+        
+        <!-- Step 5: Success -->
+        <div class="recovery-step hidden" id="recoveryStep5">
+          <div class="success-message-container">
+            <div class="success-icon">✅</div>
+            <h3>Password Reset Successful!</h3>
+            <p>Your password has been successfully reset. You can now log in using your new password.</p>
+            <button type="button" class="btn btn-primary back-to-login-btn" id="backToLoginFromSuccess">
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard | Rasally School Staff Management</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/employee.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav" id="topNav">
+        <div class="nav-left">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="brand">
+                <img src="assets/images/rasally.jpg" alt="Rasally Logo" class="nav-logo" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22%231e3a5f%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2216%22%3ERS%3C/text%3E%3C/svg%3E'">
+                <span class="brand-text">RASALLY SCHOOL STAFF MANAGEMENT SYSTEM</span>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <div class="date-time" id="dateTime">
+                <span id="currentDate"></span>
+                <span id="currentTime" class="time-display"></span>
+            </div>
+            
+            <div class="notification-wrapper">
+                <button class="icon-btn notification-btn" id="notificationBtn" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
+                <div class="notification-dropdown hidden" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h4>Notifications</h4>
+                        <button class="mark-all-read">Mark all read</button>
+                    </div>
+                    <div class="notification-list">
+                        <div class="notification-item unread">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <p>Leave request approved</p>
+                                <small>2 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="notification-item unread">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <p>Salary processed for June</p>
+                                <small>1 day ago</small>
+                            </div>
+                        </div>
+                        <div class="notification-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <p>Late arrival recorded</p>
+                                <small>3 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-wrapper">
+                <button class="profile-btn" id="profileBtn">
+                    <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23f0b84d%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2218%22%3EJD%3C/text%3E%3C/svg%3E" 
+                         alt="Profile" class="profile-img">
+                    <div class="profile-info">
+                        <span class="profile-name" id="employeeName">John Doe</span>
+                        <span class="profile-role" id="employeeRole">Teacher</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="profile-dropdown hidden" id="profileDropdown">
+                    <a href="#" class="dropdown-item"><i class="fas fa-user"></i> View Profile</a>
+                    <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="#" class="dropdown-item" id="quickLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-menu">
+            <a href="#" class="menu-item active" data-section="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+            <a href="#" class="menu-item" data-section="attendance">
+                <i class="fas fa-calendar-check"></i>
+                <span class="menu-text">Attendance</span>
+            </a>
+            <a href="#" class="menu-item" data-section="payroll">
+                <i class="fas fa-money-bill-wave"></i>
+                <span class="menu-text">Payroll</span>
+            </a>
+            <a href="#" class="menu-item" data-section="permission">
+                <i class="fas fa-file-alt"></i>
+                <span class="menu-text">Permission</span>
+            </a>
+            <a href="#" class="menu-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span class="menu-text">Settings</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutMenuItem">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard Section -->
+        <section class="content-section active" id="dashboardSection">
+            <div class="welcome-banner">
+                <h1>Welcome back, <span id="welcomeName">John Doe</span>!</h1>
+                <p>Here's your overview for today</p>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon present">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="presentDays">245</h3>
+                        <p>Present Days</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon absent">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="absentDays">12</h3>
+                        <p>Absent Days</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingRequests">3</h3>
+                        <p>Pending Requests</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon salary">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="salaryStatus">TZS3,500</h3>
+                        <p>Current Salary</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Attendance Status Card with Location -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Attendance Status</h3>
+                        <span class="status-badge" id="attendanceStatusBadge"> Not Checked In</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="clock-display">
+                            <div class="big-clock" id="liveClock">00:00:00</div>
+                            <p id="currentDateDisplay">Sunday, June 14, 2026</p>
+                        </div>
+                        
+                        <!-- Location Status Indicator -->
+                        <div class="location-status" id="locationStatusIndicator">
+                            <div class="location-indicator" id="locationDot">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="locationStatusText">Location not verified</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline" id="retryLocationBtn" style="display:none;">
+                                <i class="fas fa-sync-alt"></i> Retry
+                            </button>
+                        </div>
+                        
+                        <div class="attendance-actions">
+                            <button class="btn btn-success" id="checkInBtn">
+                                <i class="fas fa-sign-in-alt"></i> Check In
+                            </button>
+                            <button class="btn btn-warning" id="checkOutBtn" disabled>
+                                <i class="fas fa-sign-out-alt"></i> Check Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Monthly Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="monthly-stats">
+                            <div class="stat-row">
+                                <span>Working Days</span>
+                                <span class="stat-value">22</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Days Present</span>
+                                <span class="stat-value">20</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Late Arrivals</span>
+                                <span class="stat-value">2</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Overtime Hours</span>
+                                <span class="stat-value">8.5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Notifications</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-mini-list">
+                            <div class="notif-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <div>
+                                    <p>Leave approved for June 20-22</p>
+                                    <small>1 day ago</small>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <i class="fas fa-info-circle text-info"></i>
+                                <div>
+                                    <p>Staff meeting tomorrow at 3 PM</p>
+                                    <small>2 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+                    <div class="card-body quick-actions">
+                        <button class="action-btn" data-navigate="attendance">
+                            <i class="fas fa-calendar-check"></i> View Attendance
+                        </button>
+                        <button class="action-btn" data-navigate="permission">
+                            <i class="fas fa-file-alt"></i> Request Leave
+                        </button>
+                        <button class="action-btn" data-navigate="payroll">
+                            <i class="fas fa-file-invoice"></i> View Payslip
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Attendance Section with Location Tracking -->
+        <section class="content-section" id="attendanceSection">
+            <h2 class="section-title">Attendance Management with Location Verification</h2>
+            
+            <!-- Location Status Card -->
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3><i class="fas fa-map-marker-alt"></i> Location Verification</h3>
+                    <span class="location-verification-badge" id="locationVerificationBadge">
+                        <i class="fas fa-circle"></i> Checking...
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="location-info-grid">
+                        <div class="location-details">
+                            <div class="location-detail-item">
+                                <label>Latitude:</label>
+                                <span id="displayLatitude">--</span>
+                            </div>
+                            <div class="location-detail-item">
+                                <label>Longitude:</label>
+                                <span id="displayLongitude">--</span>
+                            </div>
+                            <div class="location-detail-item">
+                                <label>Accuracy:</label>
+                                <span id="displayAccuracy">--</span>
+                            </div>
+                            <div class="location-detail-item">
+                                <label>Time Captured:</label>
+                                <span id="displayLocationTime">--</span>
+                            </div>
+                            <div class="location-detail-item">
+                                <label>Distance from School:</label>
+                                <span id="displayDistance">--</span>
+                            </div>
+                            <div class="location-detail-item">
+                                <label>Address:</label>
+                                <span id="displayAddress">Fetching address...</span>
+                            </div>
+                        </div>
+                        <div class="location-map-container">
+                            <div id="attendanceMap" class="attendance-map"></div>
+                        </div>
+                    </div>
+                    <div class="location-actions">
+                        <button class="btn btn-outline" id="refreshLocationBtn">
+                            <i class="fas fa-sync-alt"></i> Refresh Location
+                        </button>
+                        <span class="geofence-status" id="geofenceStatus"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Today's Attendance Card -->
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3>Today's Attendance</h3>
+                </div>
+                <div class="card-body">
+                    <div class="attendance-status-large">
+                        <div class="status-indicator" id="attendanceIndicator">
+                            <i class="fas fa-circle"></i>
+                            <span>Checked Status</span>
+                        </div>
+                        <div class="time-records">
+                            <div class="time-record">
+                                <label>Check In:</label>
+                                <span id="checkInTime">--:--</span>
+                            </div>
+                            <div class="time-record">
+                                <label>Check Out:</label>
+                                <span id="checkOutTime">--:--</span>
+                            </div>
+                            <div class="time-record">
+                                <label>Total Hours:</label>
+                                <span id="totalHours">0.0</span>
+                            </div>
+                            <div class="time-record">
+                                <label>Location:</label>
+                                <span id="checkInLocation">--</span>
+                            </div>
+                        </div>
+                        <div class="attendance-actions">
+                            <button class="btn btn-success" id="attCheckInBtn">
+                                <i class="fas fa-sign-in-alt"></i> Check In
+                            </button>
+                            <button class="btn btn-warning" id="attCheckOutBtn" disabled>
+                                <i class="fas fa-sign-out-alt"></i> Check Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance History Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Attendance History with Location Data</h3>
+                    <div class="card-actions">
+                        <input type="month" id="monthFilter" class="form-control-sm">
+                        <input type="text" id="attendanceSearch" placeholder="Search..." class="form-control-sm">
+                        <button class="btn btn-sm btn-outline" id="exportAttendance">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Location</th>
+                                    <th>Distance</th>
+                                    <th>Verification</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payroll Section -->
+        <section class="content-section" id="payrollSection">
+            <h2 class="section-title">Payroll Management</h2>
+            
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3>Salary Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="payroll-summary">
+                        <div class="payroll-item">
+                            <span>Employee ID:</span>
+                            <strong>RS-EMP-2024001</strong>
+                        </div>
+                        <div class="payroll-item">
+                            <span>Position:</span>
+                            <strong id="payrollPosition">Teacher</strong>
+                        </div>
+                        <div class="payroll-item">
+                            <span>Department:</span>
+                            <strong id="payrollDepartment">Science</strong>
+                        </div>
+                        <div class="payroll-item">
+                            <span>Salary Month:</span>
+                            <strong id="payrollMonth">June 2026</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="salary-breakdown">
+                        <div class="salary-row">
+                            <span>Basic Salary:</span>
+                            <span class="amount">TZS3,000.00</span>
+                        </div>
+                        <div class="salary-row">
+                            <span>Allowances:</span>
+                            <span class="amount text-success">+TZS500.00</span>
+                        </div>
+                        <div class="salary-row">
+                            <span>Deductions:</span>
+                            <span class="amount text-danger">-TZS200.00</span>
+                        </div>
+                        <div class="salary-row total">
+                            <span>Net Salary:</span>
+                            <span class="amount">TZS3,300.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-status">
+                        <span class="badge badge-success" id="paymentStatus">Paid</span>
+                        <span class="payment-date">Paid on: June 1, 2026</span>
+                    </div>
+                    
+                    <div class="payslip-actions">
+                        <button class="btn btn-primary" id="viewPayslip">
+                            <i class="fas fa-eye"></i> View Payslip
+                        </button>
+                        <button class="btn btn-outline" id="downloadPayslip">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                        <button class="btn btn-outline" id="printPayslip">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Payroll History</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Basic Salary</th>
+                                    <th>Allowances</th>
+                                    <th>Deductions</th>
+                                    <th>Net Salary</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payrollTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Permission Section -->
+        <section class="content-section" id="permissionSection">
+            <h2 class="section-title">Permission Requests</h2>
+            
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3>New Permission Request</h3>
+                </div>
+                <div class="card-body">
+                    <form id="permissionForm" class="permission-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="permissionType">Permission Type *</label>
+                                <select id="permissionType" required>
+                                    <option value="">Select type</option>
+                                    <option value="Leave Request">Leave Request</option>
+                                    <option value="Sick Leave">Sick Leave</option>
+                                    <option value="Emergency Leave">Emergency Leave</option>
+                                    <option value="Permission to Skip Work">Permission to Skip Work</option>
+                                    <option value="Official Duty Leave">Official Duty Leave</option>
+                                    <option value="Late Arrival Permission">Late Arrival Permission</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startDate">Start Date *</label>
+                                <input type="date" id="startDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endDate">End Date *</label>
+                                <input type="date" id="endDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reason">Reason *</label>
+                                <textarea id="reason" rows="3" placeholder="Please provide detailed reason..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="supportDoc">Supporting Document</label>
+                                <input type="file" id="supportDoc" accept=".pdf,.jpg,.png,.doc">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Permission History</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Duration</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="content-section" id="settingsSection">
+            <h2 class="section-title">Account Settings</h2>
+            
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-tab="profile">Profile</button>
+                <button class="tab-btn" data-tab="security">Security</button>
+                <button class="tab-btn" data-tab="notifications">Notifications</button>
+                <button class="tab-btn" data-tab="appearance">Appearance</button>
+            </div>
+
+            <!-- Profile Settings -->
+            <div class="tab-content active" id="profileTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Profile Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="profileForm">
+                            <div class="profile-pic-section">
+                                <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23f0b84d%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2245%22%3EJD%3C/text%3E%3C/svg%3E" 
+                                     alt="Profile" id="profilePreview" class="settings-profile-img">
+                                <button type="button" class="btn btn-sm btn-outline">Change Photo</button>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" value="Yahya Abdallah">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" value="Yahya@rasally.edu">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" value="+255 123 456 789">
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" id="address" value="Dar es Salaam, Tanzania">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" class="btn btn-outline">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="tab-content" id="securityTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Change Password</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="passwordForm">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" required minlength="8">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="twoFactorToggle">
+                                    <span>Enable Two-Factor Authentication</span>
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="tab-content" id="notificationsTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Notification Preferences</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-settings">
+                            <div class="setting-item">
+                                <span>Email Notifications</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Attendance Reminders</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Payroll Notifications</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Permission Updates</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appearance Settings -->
+            <div class="tab-content" id="appearanceTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Appearance Settings</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="theme-options">
+                            <div class="theme-option" data-theme="light">
+                                <div class="theme-preview light-preview"></div>
+                                <span>Light Mode</span>
+                                <input type="radio" name="theme" value="light" checked>
+                            </div>
+                            <div class="theme-option" data-theme="dark">
+                                <div class="theme-preview dark-preview"></div>
+                                <span>Dark Mode</span>
+                                <input type="radio" name="theme" value="dark">
+                            </div>
+                            <div class="theme-option" data-theme="system">
+                                <div class="theme-preview system-preview"></div>
+                                <span>System Theme</span>
+                                <input type="radio" name="theme" value="system">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal hidden" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Logout</h3>
+                <button class="modal-close" id="closeLogoutModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <p>Are you sure you want to logout?</p>
+                <p class="text-muted">You will be redirected to the login page.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelLogout">Cancel</button>
+                <button class="btn btn-danger" id="confirmLogout">
+                    <span class="btn-text">Logout</span>
+                    <span class="loading-spinner hidden" id="logoutSpinner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Leaflet JS for Maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- External JavaScript -->
+    <script src="js/employee.js"></script>
+</body>
+</html>

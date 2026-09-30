@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Rasally School Staff Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            <div class="brand">
+                <img src="assets/images/rasally.jpg" alt="Logo" class="nav-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22%231e3a5f%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2216%22%3ERS%3C/text%3E%3C/svg%3E'">
+                <span class="brand-text">RASALLY SCHOOL STAFF MANAGEMENT SYSTEM</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="date-time"><span id="currentDate"></span><span id="currentTime" class="time-display"></span></div>
+            <div class="notification-wrapper">
+                <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notificationCount">0</span></button>
+                <div class="dropdown hidden" id="notificationDropdown">
+                    <div class="dropdown-header"><h4>Notifications</h4><button class="text-btn" id="markAllRead">Mark all read</button></div>
+                    <div class="dropdown-list" id="notificationList"></div>
+                </div>
+            </div>
+            <div class="profile-wrapper">
+                <button class="profile-btn" id="profileBtn">
+                    <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%230a2540%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2218%22%3EAD%3C/text%3E%3C/svg%3E" alt="Admin" class="profile-img">
+                    <div class="profile-info"><span class="profile-name" id="adminName">Admin User</span><span class="profile-role">System Administrator</span></div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown hidden" id="profileDropdown">
+                    <a href="#" class="dropdown-item" id="viewProfile"><i class="fas fa-user"></i> View Profile</a>
+                    <a href="#" class="dropdown-item" id="settingsNav"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="#" class="dropdown-item" id="quickLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+            <a href="#" class="nav-item" data-section="users"><i class="fas fa-users-cog"></i><span>Manage Users</span></a>
+            <a href="#" class="nav-item" data-section="attendance"><i class="fas fa-calendar-check"></i><span>Manage Attendance</span></a>
+            <a href="#" class="nav-item" data-section="payroll"><i class="fas fa-money-bill-wave"></i><span>Manage Payroll</span></a>
+            <a href="#" class="nav-item" data-section="permissions"><i class="fas fa-file-alt"></i><span>Permissions</span></a>
+            <a href="#" class="nav-item" data-section="reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+            <a href="#" class="nav-item" data-section="settings"><i class="fas fa-cog"></i><span>System Settings</span></a>
+            <a href="#" class="nav-item" id="logoutMenu"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard Section -->
+        <section class="section active" id="dashboardSection">
+            <div class="welcome-banner"><h1>Admin Dashboard</h1><p>System overview and quick actions</p></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon" style="background:#e8f4fd;color:#3182ce;"><i class="fas fa-users"></i></div><div class="stat-info"><h3 id="totalUsers">0</h3><p>Total Users</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#c6f6d5;color:#38a169;"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3 id="totalHR">0</h3><p>HR Officers</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#fefcbf;color:#d69e2e;"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3 id="presentToday">0</h3><p>Present Today</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#fed7d7;color:#e53e3e;"><i class="fas fa-clock"></i></div><div class="stat-info"><h3 id="pendingPerms">0</h3><p>Pending Requests</p></div></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="card"><div class="card-header"><h3>Attendance Overview</h3></div><div class="card-body"><canvas id="attendanceChart" height="250"></canvas></div></div>
+                <div class="card"><div class="card-header"><h3>User Distribution</h3></div><div class="card-body"><canvas id="userChart" height="250"></canvas></div></div>
+                <div class="card"><div class="card-header"><h3>Payroll Statistics (TZS)</h3></div><div class="card-body"><canvas id="payrollChart" height="250"></canvas></div></div>
+                <div class="card"><div class="card-header"><h3>Leave Statistics</h3></div><div class="card-body"><canvas id="leaveChart" height="250"></canvas></div></div>
+                <div class="card"><div class="card-header"><h3>Recent Activities</h3></div><div class="card-body"><div class="activity-list" id="activityFeed"></div></div></div>
+                <div class="card"><div class="card-header"><h3>Quick Actions</h3></div><div class="card-body quick-actions">
+                    <button class="action-btn" data-navigate="users"><i class="fas fa-user-plus"></i> Add New User</button>
+                    <button class="action-btn" data-navigate="payroll"><i class="fas fa-calculator"></i> Manage Payroll</button>
+                    <button class="action-btn" data-navigate="attendance"><i class="fas fa-calendar-check"></i> View Attendance</button>
+                    <button class="action-btn" data-navigate="permissions"><i class="fas fa-clipboard-check"></i> Review Permissions</button>
+                    <button class="action-btn" data-navigate="reports"><i class="fas fa-chart-bar"></i> Generate Reports</button>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- Manage Users Section -->
+<section class="section" id="usersSection">
+    <div class="section-header">
+        <h2>User Management</h2>
+        <button class="btn btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> Add User</button>
+    </div>
+    
+    <div class="card mb-20">
+        <div class="card-header"><h3>Register New User</h3></div>
+        <div class="card-body">
+            <form id="registerUserForm" class="user-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="regName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Employee ID *</label>
+                        <input type="text" id="regEmpId" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="regEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="regPhone" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Department *</label>
+                        <select id="regDept" class="form-control" required>
+                            <option value="">Select Department</option>
+                            <option value="Administration">Administration</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Finance">Finance</option>
+                            <option value="ICT">ICT</option>
+                            <option value="Academic">Academic</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Security">Security</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <input type="text" id="regPosition" class="form-control" placeholder="e.g., Teacher, Manager">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Role *</label>
+                        <select id="regRole" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="HR Officer">HR Officer</option>
+                            <option value="Employee">Employee</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Username *</label>
+                        <input type="text" id="regUsername" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="regPassword" class="form-control" required minlength="6">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Register User</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Users List</h3>
+            <div class="filter-bar">
+                <input type="text" id="userSearch" placeholder="Search..." class="form-control-sm">
+                <select id="userDeptFilter" class="form-control-sm">
+                    <option value="">All Depts</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Finance">Finance</option>
+                    <option value="ICT">ICT</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Security">Security</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+                <select id="userRoleFilter" class="form-control-sm">
+                    <option value="">All Roles</option>
+                    <option value="Admin">Admin</option>
+                    <option value="HR Officer">HR Officer</option>
+                    <option value="Employee">Employee</option>
+                </select>
+                <select id="userStatusFilter" class="form-control-sm">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Suspended">Suspended</option>
+                </select>
+                <button class="btn btn-sm btn-outline" id="refreshUsersBtn"><i class="fas fa-sync-alt"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <!-- Manage Attendance Section -->
+        <section class="section" id="attendanceSection">
+            <h2>Attendance Management</h2>
+            <div class="stats-grid mb-20">
+                <div class="stat-card"><div class="stat-icon" style="background:#c6f6d5;color:#38a169;"><i class="fas fa-calendar-check"></i></div><div class="stat-info"><h3 id="totalAttendanceToday">0</h3><p>Present Today</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#fefcbf;color:#d69e2e;"><i class="fas fa-clock"></i></div><div class="stat-info"><h3 id="lateToday">0</h3><p>Late Today</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#fed7d7;color:#e53e3e;"><i class="fas fa-user-times"></i></div><div class="stat-info"><h3 id="absentToday">0</h3><p>Absent Today</p></div></div>
+            </div>
+            <div class="card"><div class="card-header"><h3>Attendance Records</h3><div class="filter-bar">
+                <input type="text" id="attSearch" placeholder="Search employee..." class="form-control-sm">
+                <input type="date" id="attDateFilter" class="form-control-sm">
+                <button class="btn btn-sm btn-outline" id="refreshAttBtn"><i class="fas fa-sync-alt"></i></button>
+                <button class="btn btn-sm btn-outline" id="exportAttBtn"><i class="fas fa-download"></i> Export CSV</button>
+            </div></div><div class="card-body"><div class="table-responsive"><table class="data-table">
+                <thead><tr><th>Employee</th><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th><th>Location</th><th>Actions</th></tr></thead>
+                <tbody id="attendanceTableBody"></tbody>
+            </table></div></div></div>
+        </section>
+
+        <!-- Manage Payroll Section -->
+        <section class="section" id="payrollSection">
+            <h2>Payroll Management</h2>
+            <div class="stats-grid mb-20">
+                <div class="stat-card"><div class="stat-icon" style="background:#e8f4fd;color:#3182ce;"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h3 id="totalPayrollCost">TZS 0</h3><p>Total Cost</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#c6f6d5;color:#38a169;"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="processedPayroll">0</h3><p>Processed</p></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:#fefcbf;color:#d69e2e;"><i class="fas fa-clock"></i></div><div class="stat-info"><h3 id="pendingPayroll">0</h3><p>Pending</p></div></div>
+            </div>
+            <div class="card mb-20"><div class="card-header"><h3>Salary Calculator</h3></div><div class="card-body"><div class="payroll-calc">
+                <div class="form-row"><div class="form-group"><label>Employee</label><select id="payrollEmployee" class="form-control"></select></div><div class="form-group"><label>Payroll Month</label><input type="month" id="payrollMonth" class="form-control"></div></div>
+                <div class="form-row"><div class="form-group"><label>Basic Salary (TZS)</label><input type="number" id="basicSalary" class="form-control" value="850000"></div><div class="form-group"><label>Allowances (TZS)</label><input type="number" id="allowances" class="form-control" value="225000"></div><div class="form-group"><label>Overtime (TZS)</label><input type="number" id="overtime" class="form-control" value="0"></div></div>
+                <div class="form-row"><div class="form-group"><label>Tax (TZS)</label><input type="number" id="tax" class="form-control" value="85000"></div><div class="form-group"><label>Deductions (TZS)</label><input type="number" id="deductions" class="form-control" value="25000"></div></div>
+                <div class="salary-result"><h3>Net Salary: <span id="netSalaryResult">TZS 965,000</span></h3></div>
+                <div class="form-actions"><button class="btn btn-primary" id="calcSalaryBtn"><i class="fas fa-calculator"></i> Calculate</button><button class="btn btn-success" id="savePayrollBtn"><i class="fas fa-save"></i> Save Payroll</button><button class="btn btn-outline" id="genPayslipBtn"><i class="fas fa-file-pdf"></i> Generate Payslip</button></div>
+            </div></div></div>
+            <div class="card"><div class="card-header"><h3>Payroll Records</h3><div class="filter-bar"><input type="text" id="payrollSearch" placeholder="Search..." class="form-control-sm"><button class="btn btn-sm btn-outline" id="refreshPayrollBtn"><i class="fas fa-sync-alt"></i></button></div></div><div class="card-body"><div class="table-responsive"><table class="data-table">
+                <thead><tr><th>Employee</th><th>Month</th><th>Basic</th><th>Allowances</th><th>Deductions</th><th>Net</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="payrollTableBody"></tbody>
+            </table></div></div></div>
+        </section>
+
+        <!-- Permissions Section -->
+        <section class="section" id="permissionsSection">
+            <h2>Permission Management</h2>
+            <div class="card"><div class="card-header"><h3>All Requests</h3><div class="filter-bar">
+                <select id="permStatusFilter" class="form-control-sm"><option value="">All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+                <select id="permTypeFilter" class="form-control-sm"><option value="">All Types</option><option>Annual Leave</option><option>Sick Leave</option><option>Emergency Leave</option><option>Official Duty</option><option>Late Arrival</option></select>
+                <button class="btn btn-sm btn-outline" id="refreshPermBtn"><i class="fas fa-sync-alt"></i></button>
+            </div></div><div class="card-body"><div class="table-responsive"><table class="data-table">
+                <thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="permTableBody"></tbody>
+            </table></div></div></div>
+        </section>
+
+        <!-- Reports Section -->
+        <section class="section" id="reportsSection">
+            <h2>Report Management</h2>
+            <div class="reports-grid">
+                <div class="card"><div class="card-header"><h3>Attendance Reports</h3></div><div class="card-body quick-actions">
+                    <button class="action-btn report-btn" data-report="attendance-daily"><i class="fas fa-file-alt"></i> Daily Report</button>
+                    <button class="action-btn report-btn" data-report="attendance-weekly"><i class="fas fa-file-alt"></i> Weekly Report</button>
+                    <button class="action-btn report-btn" data-report="attendance-monthly"><i class="fas fa-file-alt"></i> Monthly Report</button>
+                </div></div>
+                <div class="card"><div class="card-header"><h3>Payroll Reports</h3></div><div class="card-body quick-actions">
+                    <button class="action-btn report-btn" data-report="payroll-monthly"><i class="fas fa-file-invoice"></i> Monthly Summary</button>
+                    <button class="action-btn report-btn" data-report="payroll-employee"><i class="fas fa-file-invoice"></i> Employee History</button>
+                </div></div>
+                <div class="card"><div class="card-header"><h3>Permission Reports</h3></div><div class="card-body quick-actions">
+                    <button class="action-btn report-btn" data-report="perm-approved"><i class="fas fa-check-circle"></i> Approved</button>
+                    <button class="action-btn report-btn" data-report="perm-rejected"><i class="fas fa-times-circle"></i> Rejected</button>
+                    <button class="action-btn report-btn" data-report="perm-pending"><i class="fas fa-clock"></i> Pending</button>
+                </div></div>
+                <div class="card"><div class="card-header"><h3>User Reports</h3></div><div class="card-body quick-actions">
+                    <button class="action-btn report-btn" data-report="users-all"><i class="fas fa-users"></i> All Users</button>
+                    <button class="action-btn report-btn" data-report="users-active"><i class="fas fa-user-check"></i> Active Users</button>
+                    <button class="action-btn report-btn" data-report="users-suspended"><i class="fas fa-user-slash"></i> Suspended Users</button>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="section" id="settingsSection">
+            <h2>System Settings</h2>
+            <div class="settings-tabs"><button class="tab-btn active" data-tab="school">School Info</button><button class="tab-btn" data-tab="access">Access Control</button><button class="tab-btn" data-tab="security">Security</button><button class="tab-btn" data-tab="notifications">Notifications</button><button class="tab-btn" data-tab="appearance">Appearance</button></div>
+            <div class="tab-content active" id="schoolTab"><div class="card"><div class="card-body"><form id="schoolForm">
+                <div class="form-row"><div class="form-group"><label>School Name</label><input type="text" class="form-control" value="Rasally School" id="schoolName"></div><div class="form-group"><label>Address</label><input type="text" class="form-control" value="Mpendae, Zanzibar" id="schoolAddress"></div></div>
+                <div class="form-row"><div class="form-group"><label>Phone</label><input type="tel" class="form-control" value="+255 777 888 999" id="schoolPhone"></div><div class="form-group"><label>Email</label><input type="email" class="form-control" value="info@rasally.edu" id="schoolEmail"></div></div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </form></div></div></div>
+            <div class="tab-content" id="accessTab"><div class="card"><div class="card-body"><div class="toggle-list">
+                <div class="toggle-item"><span>User Registration</span><label class="switch"><input type="checkbox" id="accessReg" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Attendance Module</span><label class="switch"><input type="checkbox" id="accessAtt" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Payroll Access</span><label class="switch"><input type="checkbox" id="accessPay" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Permission Module</span><label class="switch"><input type="checkbox" id="accessPerm" checked><span class="slider"></span></label></div>
+            </div></div></div></div>
+            <div class="tab-content" id="securityTab"><div class="card"><div class="card-body"><form id="adminPasswordForm">
+                <div class="form-group"><label>Current Password</label><input type="password" class="form-control" id="adminCurrentPass" required></div>
+                <div class="form-group"><label>New Password</label><input type="password" class="form-control" id="adminNewPass" required minlength="8"></div>
+                <div class="form-group"><label>Confirm Password</label><input type="password" class="form-control" id="adminConfirmPass" required></div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Update Password</button>
+            </form></div></div></div>
+            <div class="tab-content" id="notificationsTab"><div class="card"><div class="card-body"><div class="toggle-list">
+                <div class="toggle-item"><span>Attendance Notifications</span><label class="switch"><input type="checkbox" id="notifAtt" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Payroll Notifications</span><label class="switch"><input type="checkbox" id="notifPay" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Permission Notifications</span><label class="switch"><input type="checkbox" id="notifPerm" checked><span class="slider"></span></label></div>
+                <div class="toggle-item"><span>Email Notifications</span><label class="switch"><input type="checkbox" id="notifEmail"><span class="slider"></span></label></div>
+            </div></div></div></div>
+            <div class="tab-content" id="appearanceTab"><div class="card"><div class="card-body"><div class="theme-options">
+                <label class="theme-option"><input type="radio" name="theme" value="light" id="themeLight" checked> Light Mode</label>
+                <label class="theme-option"><input type="radio" name="theme" value="dark" id="themeDark"> Dark Mode</label>
+            </div></div></div></div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div class="modal hidden" id="userDetailModal"><div class="modal-content modal-lg"><div class="modal-header"><h3>User Details</h3><button class="modal-close">&times;</button></div><div class="modal-body" id="userDetailBody"></div></div></div>
+    <div class="modal hidden" id="editUserModal"><div class="modal-content modal-lg"><div class="modal-header"><h3>Edit User</h3><button class="modal-close">&times;</button></div><div class="modal-body"><form id="editUserForm"></form></div><div class="modal-footer"><button class="btn btn-outline modal-close-btn">Cancel</button><button class="btn btn-primary" id="saveEditUserBtn">Save Changes</button></div></div></div>
+    <div class="modal hidden" id="confirmModal"><div class="modal-content"><div class="modal-header"><h3 id="confirmTitle">Confirm</h3><button class="modal-close">&times;</button></div><div class="modal-body"><p id="confirmMessage"></p></div><div class="modal-footer"><button class="btn btn-outline modal-close-btn">Cancel</button><button class="btn btn-danger" id="confirmActionBtn">Confirm</button></div></div></div>
+    <div class="modal hidden" id="payslipModal"><div class="modal-content"><div class="modal-header"><h3>Payslip</h3><button class="modal-close">&times;</button></div><div class="modal-body" id="payslipBody"></div><div class="modal-footer"><button class="btn btn-outline" id="printPayslipBtn"><i class="fas fa-print"></i> Print</button><button class="btn btn-primary" id="downloadPayslipBtn"><i class="fas fa-download"></i> Download PDF</button></div></div></div>
+    <div class="modal hidden" id="logoutModal"><div class="modal-content"><div class="modal-header"><h3>Confirm Logout</h3><button class="modal-close">&times;</button></div><div class="modal-body"><i class="fas fa-sign-out-alt" style="font-size:48px;color:#d69e2e;"></i><p>Are you sure you want to logout?</p></div><div class="modal-footer"><button class="btn btn-outline modal-close-btn">Cancel</button><button class="btn btn-danger" id="confirmLogout"><span id="logoutText">Logout</span><span class="loading-spinner hidden" id="logoutSpinner"></span></button></div></div></div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
